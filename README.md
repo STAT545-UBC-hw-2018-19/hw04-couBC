@@ -8,5 +8,6 @@ hw04-couBC created by GitHub Classroom
 
 [Link to figure files](hw04_cou_files/figure-markdown_github)
 
+"Self-description" - xkcd
 ![](https://imgs.xkcd.com/comics/self_description.png)
 
