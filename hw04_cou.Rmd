@@ -28,6 +28,7 @@ Asia_lifeExp <- gapminder %>%
   print(n = Inf)
 ```
 
+I spread the data so that each year (row data) only appears once. This is untidy because it breaks the rules of tidy data which are 1) each variable must have its own column, 2) each observation must have its own row, and 3) eacj value must have its own cell (R4DS). In this case, country as a variable is now spread over 4 columns. 
 
 
 ```{r}
@@ -36,14 +37,25 @@ Asia_untidy <- Asia_lifeExp %>%
 Asia_untidy
 ```
  
+
+##This plot shows the highest and lowest life expectancy Asian countries between 1952-2007
  
- 
+```{r}
+Asia_lifeExp %>% 
+  ggplot(aes(x = year, y = lifeExp, color = country)) +
+  geom_point() +
+  geom_line() +
+  ggtitle("Highest and Lowest Life Expectancy in Asia 1952-2007")
+
+```
 
 #Task 2: 
 Create your own cheatsheet patterned after Jenny’s but focused on something you care about more than comics.
 
 You will likely need to iterate between your data prep and your joining to make your explorations comprehensive and interesting. For example, you will want a specific amount (or lack) of overlap between the two data.frames, in order to demonstrate all the different joins. You will want both the data frames to be as small as possible, while still retaining the expository value
 
+
+I created two tables - one of a few places I've visited, and one of a few airports I've flown to/through, with significance but not complete overlap between the two tables.
 
 ```{r}
 places_visited <- "
@@ -72,7 +84,7 @@ airports <- read_csv(airports, skip = 1)
 airports
 ```
 ##left_join(places_visited, airports)
-
+With left join places_visited then airports, I am missing Schiphol airport (Netherlands) from the airports table. This left_join is matched by 'country'.
 ```{r}
 
 
@@ -80,11 +92,11 @@ lj_pa <- left_join(places_visited, airports) %>%
   knitr::kable()
 lj_pa
 
-#with left join places_visited then airports, I am missing Schiphol airport (Netherlands) from the airports table. This left_join is matched by 'country'.
+
 ```
 
 ## left_join(airports, places_visited)
-
+With left_join airport first, I retain Schiphol Airport (Netherlands) but lose Merida, Mexico as a place visited. Interpretation wise, this is an accurate depiction of my travel history as I've been to Schiphol airport but never been to Amsterdam. 
 ```{r}
 
 lj_ap <- left_join(airports, places_visited) %>% 
@@ -92,9 +104,12 @@ knitr::kable()
 
 lj_ap
 
-#with left_join airport first, I retain Schiphol Airport (Netherlands) but lose Merida, Mexico as a place visited. Interpretation wise, this is an accurate depiction of my travel history as I've been to Schiphol airport but never been to Amsterdam. 
+
 ```
+
 ##right_join(places_visited, airports)
+Similar to left_join, I lose a bit of information. In Right_join(places_visited, airports) I lose out on 
+visiting Merida, Mexico because I did not fly there.
 
 ```{r}
 rj_pa <- right_join(places_visited, airports) %>% 
@@ -102,10 +117,11 @@ knitr::kable()
 
 rj_pa
 
-# similar to left_join, I lose a bit of information. In Right_join(places_visited, airports) I lose out on visiting Merida, Mexico because I did not fly there. 
+
 ```
 
 ##right_join(airports, places_visited)
+Here it depicts that I've been to Merida, Mexico but gives no quality of rating of airport.
 
 ```{r}
 rj_ap <- 
@@ -113,10 +129,12 @@ rj_ap <-
 knitr::kable()
 
 rj_ap
-#Here it depicts that I've been to Merida, Mexico but gives no quality of rating of airport.
+
 
 ```
+
 ##inner_join(places_visited, airports)
+Inner_join retains only rows in both sets. Here I miss out on Merida and Schiphol Airport
 
 ```{r}
 ij_pa <- inner_join(places_visited, airports) %>% 
@@ -124,41 +142,42 @@ knitr::kable()
 
 ij_pa
 
-#Inner_join retains only rows in both sets. Here I miss out on Merida and Schiphol Airport
 ```
 
 ## inner_join(airports, places_visited)
-
+Similarly, I miss out on Merida and Schiphol Airport
 
 ```{r}
 ij_ap <- inner_join(airports, places_visited) %>% 
 knitr::kable()
 ij_ap
 
-#Similarly, I miss out on Merida and Schiphol Airport
 ```
 
 ##semi_join(places_visited, airports)
+in semi-join - only rows that have a match in places_visited and airports are retained, losing columns re: airport and airport quality
+
 
 ```{r}
 sj_pa <- semi_join(places_visited, airports) %>% 
 knitr::kable()
 sj_pa
 
-#in semi-join - only rows that have a match in places_visited and airports are retained, losing columns re: airport and airport quality
 ```
 
 ##semi_join(airports, places_visited)
+Here I lose out on city and beach columns.
 
 ```{r}
 sj_ap <- semi_join(airports, places_visited) %>% 
 knitr::kable()
 sj_ap
 
-#Here I lose out on city and beach columns.
+
 ```
 
 ##full_join(places_visited, airports)
+full_join lets me retain the data from all rows and all values
 
 ```{r}
 fj_pa <- 
@@ -166,10 +185,10 @@ full_join(places_visited, airports) %>%
 knitr::kable()
 fj_pa
 
-#full_join lets me retain the data from all rows and all values
 ```
 
 ##full_join(airports, places_visited)
+similar to previous full-join with airport table data displayed first, retains all available rows and values
 
 ```{r}
 fj_ap <- 
@@ -177,10 +196,10 @@ fj_ap <-
 knitr::kable()
 fj_ap
 
-#similar to previous full-join with airport table data displayed first, retains all available rows and values
 ```
 
 ##anti_join(places_visited, airports)
+Anti_join only retains the rows that do not have a match in airports, in which case, this is Merida. I hypothesize that anti_join with airports first will produce Schiphol
 
 ```{r}
 aj_pa <-
@@ -189,20 +208,18 @@ knitr::kable()
 
 aj_pa
 
-#Anti_join only retains the rows that do not have a match in airports, in which case, this is Merida. I hypothesize that anti_join with airports first will produce Schiphol
 ```
 
 ##anti_join(airports, places_visited)
+anti_join can be useful to identify/extricate non-matching rows between tables
 
 ```{r}
 aj_ap <- anti_join(airports, places_visited) %>% 
 knitr::kable()
 aj_ap 
 
-
-#anti_join can be useful to identify/extricate non-matching rows between tables
 ```
 
-
+?Add interesect, union, setdiff?
 
 

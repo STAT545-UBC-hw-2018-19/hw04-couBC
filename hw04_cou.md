@@ -57,6 +57,8 @@ Asia_lifeExp <- gapminder %>%
     ## 23  2007 Afghanistan    43.8
     ## 24  2007 Japan          82.6
 
+I spread the data so that each year (row data) only appears once. This is untidy because it breaks the rules of tidy data which are 1) each variable must have its own column, 2) each observation must have its own row, and 3) eacj value must have its own cell (R4DS). In this case, country as a variable is now spread over 4 columns.
+
 ``` r
 Asia_untidy <- Asia_lifeExp %>% 
   spread(key = country, value = lifeExp)
@@ -80,12 +82,27 @@ Asia_untidy
     ## 11  2002        42.1     NA     NA    82  
     ## 12  2007        43.8     NA     NA    82.6
 
+This plot shows the highest and lowest life expectancy Asian countries between 1952-2007
+----------------------------------------------------------------------------------------
+
+``` r
+Asia_lifeExp %>% 
+  ggplot(aes(x = year, y = lifeExp, color = country)) +
+  geom_point() +
+  geom_line() +
+  ggtitle("Highest and Lowest Life Expectancy in Asia 1952-2007")
+```
+
+![](hw04_cou_files/figure-markdown_github/unnamed-chunk-4-1.png)
+
 Task 2:
 =======
 
 Create your own cheatsheet patterned after Jenny’s but focused on something you care about more than comics.
 
 You will likely need to iterate between your data prep and your joining to make your explorations comprehensive and interesting. For example, you will want a specific amount (or lack) of overlap between the two data.frames, in order to demonstrate all the different joins. You will want both the data frames to be as small as possible, while still retaining the expository value
+
+I created two tables - one of a few places I've visited, and one of a few airports I've flown to/through, with significance but not complete overlap between the two tables.
 
 ``` r
 places_visited <- "
@@ -139,6 +156,8 @@ airports
 left\_join(places\_visited, airports)
 -------------------------------------
 
+With left join places\_visited then airports, I am missing Schiphol airport (Netherlands) from the airports table. This left\_join is matched by 'country'.
+
 ``` r
 lj_pa <- left_join(places_visited, airports) %>% 
   knitr::kable()
@@ -159,12 +178,10 @@ lj_pa
 | San Antonio | United States        | no    | San Antonio       |                 1|
 | Merida      | Mexico               | no    | NA                |                NA|
 
-``` r
-#with left join places_visited then airports, I am missing Schiphol airport (Netherlands) from the airports table. This left_join is matched by 'country'.
-```
-
 left\_join(airports, places\_visited)
 -------------------------------------
+
+With left\_join airport first, I retain Schiphol Airport (Netherlands) but lose Merida, Mexico as a place visited. Interpretation wise, this is an accurate depiction of my travel history as I've been to Schiphol airport but never been to Amsterdam.
 
 ``` r
 lj_ap <- left_join(airports, places_visited) %>% 
@@ -186,12 +203,10 @@ lj_ap
 | San Antonio       | United States        |                 1| San Antonio | no    |
 | Schiphol          | Netherlands          |                 5| NA          | NA    |
 
-``` r
-#with left_join airport first, I retain Schiphol Airport (Netherlands) but lose Merida, Mexico as a place visited. Interpretation wise, this is an accurate depiction of my travel history as I've been to Schiphol airport but never been to Amsterdam. 
-```
-
 right\_join(places\_visited, airports)
 --------------------------------------
+
+Similar to left\_join, I lose a bit of information. In Right\_join(places\_visited, airports) I lose out on visiting Merida, Mexico because I did not fly there.
 
 ``` r
 rj_pa <- right_join(places_visited, airports) %>% 
@@ -213,12 +228,10 @@ rj_pa
 | San Antonio | United States        | no    | San Antonio       |                 1|
 | NA          | Netherlands          | NA    | Schiphol          |                 5|
 
-``` r
-# similar to left_join, I lose a bit of information. In Right_join(places_visited, airports) I lose out on visiting Merida, Mexico because I did not fly there. 
-```
-
 right\_join(airports, places\_visited)
 --------------------------------------
+
+Here it depicts that I've been to Merida, Mexico but gives no quality of rating of airport.
 
 ``` r
 rj_ap <- 
@@ -241,12 +254,10 @@ rj_ap
 | San Antonio       | United States        |                 1| San Antonio | no    |
 | NA                | Mexico               |                NA| Merida      | no    |
 
-``` r
-#Here it depicts that I've been to Merida, Mexico but gives no quality of rating of airport.
-```
-
 inner\_join(places\_visited, airports)
 --------------------------------------
+
+Inner\_join retains only rows in both sets. Here I miss out on Merida and Schiphol Airport
 
 ``` r
 ij_pa <- inner_join(places_visited, airports) %>% 
@@ -267,12 +278,10 @@ ij_pa
 | Rome        | Italy                | no    | Leonardo da Vinci |                 3|
 | San Antonio | United States        | no    | San Antonio       |                 1|
 
-``` r
-#Inner_join retains only rows in both sets. Here I miss out on Merida and Schiphol Airport
-```
-
 inner\_join(airports, places\_visited)
 --------------------------------------
+
+Similarly, I miss out on Merida and Schiphol Airport
 
 ``` r
 ij_ap <- inner_join(airports, places_visited) %>% 
@@ -293,12 +302,10 @@ ij_ap
 | Leonardo da Vinci | Italy                |                 3| Rome        | no    |
 | San Antonio       | United States        |                 1| San Antonio | no    |
 
-``` r
-#Similarly, I miss out on Merida and Schiphol Airport
-```
-
 semi\_join(places\_visited, airports)
 -------------------------------------
+
+in semi-join - only rows that have a match in places\_visited and airports are retained, losing columns re: airport and airport quality
 
 ``` r
 sj_pa <- semi_join(places_visited, airports) %>% 
@@ -319,12 +326,10 @@ sj_pa
 | Rome        | Italy                | no    |
 | San Antonio | United States        | no    |
 
-``` r
-#in semi-join - only rows that have a match in places_visited and airports are retained, losing columns re: airport and airport quality
-```
-
 semi\_join(airports, places\_visited)
 -------------------------------------
+
+Here I lose out on city and beach columns.
 
 ``` r
 sj_ap <- semi_join(airports, places_visited) %>% 
@@ -345,12 +350,10 @@ sj_ap
 | Leonardo da Vinci | Italy                |                 3|
 | San Antonio       | United States        |                 1|
 
-``` r
-#Here I lose out on city and beach columns.
-```
-
 full\_join(places\_visited, airports)
 -------------------------------------
+
+full\_join lets me retain the data from all rows and all values
 
 ``` r
 fj_pa <- 
@@ -374,12 +377,10 @@ fj_pa
 | Merida      | Mexico               | no    | NA                |                NA|
 | NA          | Netherlands          | NA    | Schiphol          |                 5|
 
-``` r
-#full_join lets me retain the data from all rows and all values
-```
-
 full\_join(airports, places\_visited)
 -------------------------------------
+
+similar to previous full-join with airport table data displayed first, retains all available rows and values
 
 ``` r
 fj_ap <- 
@@ -403,12 +404,10 @@ fj_ap
 | Schiphol          | Netherlands          |                 5| NA          | NA    |
 | NA                | Mexico               |                NA| Merida      | no    |
 
-``` r
-#similar to previous full-join with airport table data displayed first, retains all available rows and values
-```
-
 anti\_join(places\_visited, airports)
 -------------------------------------
+
+Anti\_join only retains the rows that do not have a match in airports, in which case, this is Merida. I hypothesize that anti\_join with airports first will produce Schiphol
 
 ``` r
 aj_pa <-
@@ -426,12 +425,10 @@ aj_pa
 |:-------|:--------|:------|
 | Merida | Mexico  | no    |
 
-``` r
-#Anti_join only retains the rows that do not have a match in airports, in which case, this is Merida. I hypothesize that anti_join with airports first will produce Schiphol
-```
-
 anti\_join(airports, places\_visited)
 -------------------------------------
+
+anti\_join can be useful to identify/extricate non-matching rows between tables
 
 ``` r
 aj_ap <- anti_join(airports, places_visited) %>% 
@@ -448,6 +445,4 @@ aj_ap
 |:---------|:------------|-----------------:|
 | Schiphol | Netherlands |                 5|
 
-``` r
-#anti_join can be useful to identify/extricate non-matching rows between tables
-```
+?Add interesect, union, setdiff?
