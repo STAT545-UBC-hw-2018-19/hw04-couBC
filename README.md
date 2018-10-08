@@ -8,4 +8,4 @@ hw04-couBC created by GitHub Classroom
 
 [Link to figure files](hw04_cou_files/figure-markdown_github)
 
-Thanks for reading.
+![](https://xkcd.com/688/)
