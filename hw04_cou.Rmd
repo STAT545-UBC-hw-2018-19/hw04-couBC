@@ -1,0 +1,158 @@
+---
+title: "hw04_couBC"
+author: "CouBC"
+date: '2018-10-07'
+output: github_document
+---
+
+#Task 1 - Data Re-Shaping
+
+In Window functions, we formed a tibble with 24 rows: 2 per year, giving the country with both the lowest and highest life expectancy (in Asia). Take that table (or a similar one for all continents) and reshape it so you have one row per year or per year * continent combination.
+
+First, I load gapminder and tidyverse.
+
+```{r}
+library(gapminder)
+library(tidyverse)
+```
+
+Then I filter gapminder for the highest and lowest life expectancies in Asia and store this in R as tidy_Asia.
+
+```{r}
+tidy_Asia <- gapminder %>%
+  filter(continent == "Asia") %>%
+  select(year, country, lifeExp) %>%
+  group_by(year) %>%
+  filter(min_rank(desc(lifeExp)) < 2 | min_rank(lifeExp) < 2) %>% 
+  arrange(year) %>%
+  print(n = Inf)
+```
+
+
+In order to reshape it so that I have one row per year, I will be spreading the table rather than gathering.
+
+```{r}
+tidy_Asia %>%
+  arrange(lifeExp)
+
+#From here I can see that Afghanistan in 2007 has the maximum lowest lifeExp of 43.8. 
+  
+```
+
+
+```{r}
+tidy_Asia %>% 
+  mutate(max_Asia = lifeExp >50) %>% 
+  mutate(min_Asia = lifeExp <50)
+```
+
+
+
+#Task 2: 
+Create your own cheatsheet patterned after Jenny’s but focused on something you care about more than comics.
+
+You will likely need to iterate between your data prep and your joining to make your explorations comprehensive and interesting. For example, you will want a specific amount (or lack) of overlap between the two data.frames, in order to demonstrate all the different joins. You will want both the data frames to be as small as possible, while still retaining the expository value
+
+
+```{r}
+places_visited <- "
+city, country, beach
+  Tokyo, Japan, no
+  Dubai, United Arab Emirates, yes
+  Istanbul, Turkey, yes
+  Rome, Italy, no
+  San Antonio, United States, no
+  Merida, Mexico, no
+"
+
+places_visited <- read_csv(places_visited, skip = 1)
+places_visited
+
+airports <- "
+airports, country, airport_quality
+  Narita, Japan, 4
+  Dubai, United Arab Emirates, 6
+  Ataturk, Turkey, 2
+  Leonardo da Vinci, Italy, 3
+  San Antonio, United States, 1
+  Schiphol, Netherlands, 5
+"
+airports <- read_csv(airports, skip = 1)
+airports
+```
+##left_join(places_visited, airports)
+
+```{r}
+
+
+ljpa <- left_join(places_visited, airports) %>% 
+  knitr::kable()
+ljpa
+
+#with left join places_visited then airports, I am missing Schiphol airport (Netherlands) from the airports table. This left_join is matched by 'country'.
+```
+
+## left_join(airports, places_visited)
+
+```{r}
+
+ljap <- left_join(airports, places_visited) %>% 
+knitr::kable()
+
+ljap
+
+#with left_join airport first, I retain Schiphol Airport (Netherlands) but lose Merida, Mexico as a place visited. Interpretation wise, this is an accurate depiction of my travel history as I've been to Schiphol airport but never been to Amsterdam. 
+```
+##right_join(places_visited, airports)
+
+```{r}
+rjpa <- right_join(places_visited, airports) 
+
+rjpa
+
+# similar to left_join, I lose a bit of information. In Right_join(places_visited, airports) I lose out on visiting Merida, Mexico because I did not fly there. 
+```
+
+##right_join(airports, places_visited)
+
+```{r}
+rjap <- 
+  right_join(airports, places_visited)
+
+rjap
+#Here it depicts that I've been to Merida, Mexico but gives no quality of rating of airport.
+
+```
+
+```{r}
+ijpa <- inner_join(places_visited, airports)
+
+ijpa
+
+#Inner_join retains only rows in both sets. Here I miss out on Merida and Schiphol Airport
+```
+
+```{r}
+ijap <- inner_join(airports, places_visited)
+ijap
+
+#Similarly, I miss out on Merida and Schiphol Airport
+```
+
+```{r}
+sjpa <- semi_join(places_visited, airports)
+sjpa
+
+#in semi-join - only rows that have a match in places_visited and airports are retained, losing columns re: airport and airport quality
+```
+
+```{r}
+sjap <- semi_join(airports, places_visited)
+sjap
+
+#Here I lose out on city and beach columns.
+```
+```{r}
+
+```
+
